@@ -1,9 +1,17 @@
+def div_gen(n):
+    for i in range(1, n):
+        if n % i == 0:
+            yield i
+
+
 def is_invalid_id(id):
     id_str = str(id)
-    if len(id_str) % 2 != 0:
-        return False
-    midpoint = len(id_str) // 2
-    return id_str[0:midpoint] == id_str[midpoint:]
+    length = len(id_str)
+    for div in div_gen(length):
+        r = id_str.count(id_str[0:div]) == (length // div)
+        if r:
+            return True
+    return False
 
 
 ranges = []
@@ -15,11 +23,10 @@ with open("day2.txt", "r") as input_file:
         split = range_str.split("-")
         ranges.append(range(int(split[0]), int(split[1]) + 1))
 
-part1_solution = 0
+part2_solution = 0
 for r in ranges:
     for n in r:
         if is_invalid_id(n):
-            print(n)
-            part1_solution += n
+            part2_solution += n
 
-print(part1_solution)
+print(part2_solution)

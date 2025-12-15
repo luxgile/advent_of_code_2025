@@ -1,16 +1,61 @@
+import gleam/int
 import gleam/io
-import gleam/uri
-import gleam/http/request
-import gleam/httpc
+import gleam/list
 import gleam/result
+import gleam/string
+import simplifile
 
-fn get_input(day: Int) {
-  let assert Ok(request) = request.to("https://adventofcode.com/2025/day/1/input")
-  use response <- result.try(httpc.send(request))
-  Ok(response.body)
+pub fn parse_rotation(str: String) {
+  let assert Ok(rotation) = case str {
+    "" -> Ok(0)
+    "L" <> n -> { "-" <> n } |> int.parse
+    "R" <> n -> n |> int.parse
+    _ -> panic as "invalid rotation"
+  }
+  rotation
+}
+
+pub fn part_1(dial, rotations, result) {
+  case rotations {
+    [rotation, ..rest] -> {
+      let dial = { dial + rotation } % 100
+      case dial {
+        0 -> part_1(dial, rest, result + 1)
+        _ -> part_1(dial, rest, result)
+      }
+    }
+    [] -> result
+  }
+}
+
+pub fn part_2(dial, rotations, result) {
+  case rotations {
+    [rotation, ..rest] -> {
+      let new_dial = dial + rotation
+      case new_dial {
+        _ if new_dial > 99 -> part_2(new_dial % 100, rest, result + new_dial / 100)
+        _ if new_dial <= 0 -> {
+          let result = result - new_dial / 100
+          case dial {
+            0 -> part_2(new_dial % 100, rest, result)
+            _ -> part_2(new_dial % 100, rest, result + 1)
+          }
+        }
+        _ -> part_2(new_dial, rest, result)
+      }
+    }
+    [] -> result
+  }
 }
 
 pub fn main() {
-  let assert Ok(body) = get_input(1)
-  io.print(body)
+  let assert Ok(input) = simplifile.read("../input/day1.txt")
+  let rotations =
+    input
+    |> string.split("\n")
+    |> list.map(string.trim)
+    |> list.map(parse_rotation)
+
+  echo "day 1 - part 1: " <> part_1(50, rotations, 0) |> int.to_string
+  echo "day 1 - part 2: " <> part_2(50, rotations, 0) |> int.to_string
 }

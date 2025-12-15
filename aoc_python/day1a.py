@@ -1,5 +1,5 @@
 inputs = []
-with open("day1.txt", "r") as input_file:
+with open("input/day1.txt", "r") as input_file:
     lines = input_file.readlines()
     for line in lines:
         rotation = int(line[1:])

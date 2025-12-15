@@ -18,8 +18,7 @@ fn is_invalid_id(id) {
 fn part_1(ranges, result) -> Int {
   case ranges {
     [] -> result
-    [range, ..rest] -> {
-      let assert #(low, high) = range
+    [#(low, high), ..rest] -> {
       let invalid_count =
         list.range(low, high)
         |> list.map(fn(x) {

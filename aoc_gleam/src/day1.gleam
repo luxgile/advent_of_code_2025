@@ -1,7 +1,5 @@
 import gleam/int
-import gleam/io
 import gleam/list
-import gleam/result
 import gleam/string
 import simplifile
 
@@ -30,21 +28,25 @@ pub fn part_1(dial, rotations, result) {
 
 pub fn part_2(dial, rotations, result) {
   case rotations {
+    [] -> result
     [rotation, ..rest] -> {
       let new_dial = dial + rotation
-      case new_dial {
-        _ if new_dial > 99 -> part_2(new_dial % 100, rest, result + new_dial / 100)
+      let carry = int.absolute_value(new_dial) / 100
+      let result = case new_dial {
+        _ if new_dial > 99 -> result + carry
         _ if new_dial <= 0 -> {
-          let result = result - new_dial / 100
+          let result = result + carry
           case dial {
-            0 -> part_2(new_dial % 100, rest, result)
-            _ -> part_2(new_dial % 100, rest, result + 1)
+            0 -> result
+            _ -> result + 1
           }
         }
-        _ -> part_2(new_dial, rest, result)
+        _ -> result
       }
+
+      let assert Ok(new_dial) = int.modulo(new_dial, 100)
+      part_2(new_dial, rest, result)
     }
-    [] -> result
   }
 }
 
